@@ -1,21 +1,22 @@
 
+
 # BlenderSimulation
 ### How to use it
 Just use the default cube and run the script for the simulation, easy as that
 
 ## Variables
-8. **cube.location**: Modify the starting point with coordinates [*x*, *y*, *z*]
-9. **mass**: Weight of the object
-10. **a**: Acceleration of gravity 
-15. **xbalancer**: If *True*, *fx* will be adjusted to reach that location
-16. **ybalancer**: If *True*, *fy* will be adjusted to reach that location
-17. **zbalancer**: If *True*, *fz* will be adjusted to reach that location
-21.  **vx**, **vy**, **vz**: Initial velocities
-25. **fx**, **fy**, **fz**: Forces 
-36. **friction**: Slows down the block if it touches the ground
-37. **damping**: Slows down the bounces if it touches the ground
-36. **fps**: Framerate of the project
-36. **end**: Duration of the simulation, in seconds
+8 . **cube.location**: Modify the starting point with coordinates [*x*, *y*, *z*]
+9 . **mass**: Weight of the object
+10 . **a**: Acceleration of gravity 
+15 . **xbalancer**: If *True*, *fx* will be adjusted to reach that location
+16 . **ybalancer**: If *True*, *fy* will be adjusted to reach that location
+17 . **zbalancer**: If *True*, *fz* will be adjusted to reach that location
+21 .  **vx**, **vy**, **vz**: Initial velocities
+25 . **fx**, **fy**, **fz**: Forces 
+36 . **friction**: Slows down the block if it touches the ground
+37 . **damping**: Slows down the bounces if it touches the ground
+41 .  **fps**: Framerate of the project
+42 . **end**: Duration of the simulation, in seconds
 
 ## Functions
 **loadingBar**
