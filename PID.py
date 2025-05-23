@@ -5,7 +5,7 @@ import math
 
 #Data of the simulation
 cube = bpy.data.objects["Cube"]
-cube.location = [0,0,0]         #Starting position at 0, 0, 0
+cube.location = [0,0,1]         #Starting position
 mass = 1                        #cube mass
 t = 0                           #time start at 0
 g = -9.81                       #gravity
@@ -19,25 +19,35 @@ class Store:
         s.z = z
     def __str__(s):                                     #DEBUG
         return(f"{s.name} data: {s.x}, {s.y}, {s.z}")
+    
+    def mul(s, value):
+            s.x *= value
+            s.y *= value
+            s.z *= value
+    def add(s, value):
+            s.x += value
+            s.y += value
+            s.z += value
     def toList(s):
         return [s.x,s.y,s.z]
 
 #Forces, velocities and position
-Force    = Store("Force", 0, 0, 0)
-Velocity = Store("Velocity", 0, 0, 0)
-Position = Store("Position", cube.location[0], cube.location[1], cube.location[2])
+Acceleration = Store("Acceleration", 0, 0, 10) #Positive = up, negative = down
+Velocity     = Store("Velocity", 10, 0, 0)
+Position     = Store("Position", cube.location[0], cube.location[1], cube.location[2])
 
-#Coefficients
-friction = 0.05        #0:Slides forever, 1: No slide
-damping = 0.5          #0:Bounce forever, 1:No bounce
+#Coefficients, 0:min <---> 1:max
+viscousity = 0.05       #0: No Viscousity, 1: Really really high viscousity
+friction = 0.5         #0:Slides forever, 1: No slide
+damping = 0.5          #0:Bounce forever, 1: No bounce
 
 #Video datas
-frame = 0       #Starting at frame 0
-fps = 24        #Match the project framerate
-end = 30        #seconds, project duration
+frame = 0        #Starting at frame 0
+fps = 24         #Match the project framerate
+end = 10         #seconds, project duration
 
 #PID values
-PIDsim = True
+PIDsim = False
 Setpoint = Store("Setpoint", 0, 0, 10)            #Setpoint to reach
 Integral = Store("Integral", 0, 0, 0)             #Integral, for integrative gain
 OldError = Store("Old Error", 0, 0, 0)            #oldError, for derivative gain
@@ -84,32 +94,39 @@ def PID(position, setpoint, integral, old_error, minVAL, maxVAL):
 #Main function
 def main():
     #Global variables:
-    global t, g, frame                  #META
-    global Position, Velocity, Force    #PHYSICS
-    global damping, friction            #GROUND
-    global Setpoint, Integral, OldError #PID
+    global t, g, frame                          #META
+    global Position, Velocity, Acceleration     #PHYSICS
+    global damping, friction, viscousity        #GROUND
+    global Setpoint, Integral, OldError         #PID
     
-    #UPDATE the cube status
-    Velocity.x += (Force.x/mass)/fps
-    Velocity.y += (Force.y/mass)/fps
-    Velocity.z += g / fps + (Force.z/mass) / fps
+    #Update acceleration
+    Acceleration.mul(1-viscousity)
     
+    #If PID control is active
+    if PIDsim:    
+        Acceleration.x, Integral.x, OldError.x = PID(Position.x, Setpoint.x, Integral.x, OldError.x, 0.10, 20)
+        Acceleration.y, Integral.y, OldError.y = PID(Position.y, Setpoint.y, Integral.y, OldError.y, 0.10, 20)
+        Acceleration.z, Integral.z, OldError.z = PID(Position.z, Setpoint.z, Integral.z, OldError.z, 0.10, 20)
+
+    #Update velocity
+    Velocity.x += (Acceleration.x)/fps
+    Velocity.y += (Acceleration.y)/fps
+    Velocity.z += g / fps + (Acceleration.z) / fps
+    
+    #Update position
     Position.x += Velocity.x/fps
     Position.y += Velocity.y/fps
     Position.z += Velocity.z/fps
     
-    if Position.z <= 0:      #Bounce detection
+    if Position.z <= 0:      #Ground touch detection
         Position.z = 0
-        Velocity.z = -Velocity.z * (1 - damping)
+        
+        Velocity.x *= (1 - friction)
+        Velocity.y *= (1 - friction)
+        Velocity.z *= -(1 - damping)
     
     bpy.data.objects["Cube"].location = Position.toList()     #New position
-        
-    #PID simulator
-    if PIDsim:    
-        Force.x, Integral.x, OldError.x = PID(Position.x, Setpoint.x, Integral.x, OldError.x, 0.10, 20)
-        Force.y, Integral.y, OldError.y = PID(Position.y, Setpoint.y, Integral.y, OldError.y, 0.10, 20)
-        Force.z, Integral.z, OldError.z = PID(Position.z, Setpoint.z, Integral.z, OldError.z, 0.10, 20)
-    
+   
     #Insert the keyframe and go to the next frame
     cube.keyframe_insert(data_path = "location", frame = frame)     #Save posititon
     bpy.data.scenes['Scene'].frame_set(bpy.data.scenes['Scene'].frame_current + 1)
