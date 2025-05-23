@@ -5,6 +5,7 @@ A Python library of scripts for simulating basic physics in Blender 3D. Just pas
 ## Available Simulations
 
 * `General`: Simulates free movement of the default cube with basic damping, friction, and viscosity effects.
+* `FreeFall`: Free fall of an object (default = cube), with terminal velocity calculation.
 * `PID`: Simulate a PID controller with the cube, allowing dynamic tuning of `k_p`, `k_i`, and `k_d` to reach defined setpoints over time.
 
 ## imitations & Future Improvements
