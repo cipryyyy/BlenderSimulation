@@ -4,8 +4,8 @@ A Python library of scripts for simulating basic physics in Blender 3D. Just pas
 
 ## Available Simulations
 
-* `General Motion`: Simulates free movement of the default cube with basic damping, friction, and viscosity effects.
-* `PID Control`: Simulate a PID controller with the cube, allowing dynamic tuning of `k_p`, `k_i`, and `k_d` to reach defined setpoints over time.
+* `General`: Simulates free movement of the default cube with basic damping, friction, and viscosity effects.
+* `PID`: Simulate a PID controller with the cube, allowing dynamic tuning of `k_p`, `k_i`, and `k_d` to reach defined setpoints over time.
 
 ## imitations & Future Improvements
 * Currently supports only translation, rotation physics will be added in the future.
